@@ -1,4 +1,4 @@
-package com.saferent.saferent;
+package com.saferent;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
