@@ -76,4 +76,16 @@ public class ContactMessageController {
         return contactMessagePage.map( // map methodu Page yapisindan geliyor
                 contactMessage -> contactMessageMapper.contactMessageToDTO(contactMessage));
     }
+
+    // !!! spesifik olarak bir ContactMessage PathVariable ile alalım
+    @GetMapping("/{id}")
+    public ResponseEntity<ContactMessageDTO> getMessageWithPath(@PathVariable("id") Long id) {
+
+        ContactMessage contactMessage = contactMessageService.getContactMessage(id);
+
+        ContactMessageDTO contactMessageDTO = contactMessageMapper.contactMessageToDTO(contactMessage);
+
+        return ResponseEntity.ok(contactMessageDTO);
+
+    }
 }
