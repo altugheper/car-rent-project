@@ -33,6 +33,6 @@ public class ContactMessageService {
 
     public ContactMessage getContactMessage(Long id) {
         return contactMessageRepository.findById(id).orElseThrow(()->
-                new ResourceNotFoundException("Contact Message is not found with id"));
+                new ResourceNotFoundException("Contact Message is not found with id: " + id));
     }
 }
