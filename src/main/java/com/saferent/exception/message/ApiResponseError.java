@@ -7,21 +7,40 @@ import java.time.LocalDateTime;
 
 public class ApiResponseError {
 
-    //AMACIM : custom error mesajlarinin ana sablonunu olusturmak
+    // AMACIM : custom error mesajlartının ana soblonunu ouşturmak
     private HttpStatus status;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime timestamp;
 
     private String message;
 
-    private String requestAPI;
+    private String requestURI ;
+
+    // Const
 
     private ApiResponseError(){
+        timestamp = LocalDateTime.now();
+    }
+
+    public ApiResponseError(HttpStatus status){
+        this(); // yukardaki parametresiz private const. çağırılıyor
+        this.message="Unexpected Error";
+        this.status = status ;
 
     }
 
-    // GETTER SETTER
+    public ApiResponseError(HttpStatus status, String message, String requestURI) {
+        this(status); // yukardaki 1 parametreli, public const. çağrılıyor
+        this.message = message;
+        this.requestURI = requestURI;
+    }
+
+
+
+    // GETTER -SETTER
+
+
     public HttpStatus getStatus() {
         return status;
     }
@@ -34,10 +53,6 @@ public class ApiResponseError {
         return timestamp;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
     public String getMessage() {
         return message;
     }
@@ -46,11 +61,11 @@ public class ApiResponseError {
         this.message = message;
     }
 
-    public String getRequestAPI() {
-        return requestAPI;
+    public String getRequestURI() {
+        return requestURI;
     }
 
-    public void setRequestAPI(String requestAPI) {
-        this.requestAPI = requestAPI;
+    public void setRequestURI(String requestURI) {
+        this.requestURI = requestURI;
     }
 }
