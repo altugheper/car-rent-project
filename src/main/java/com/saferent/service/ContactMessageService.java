@@ -2,6 +2,7 @@ package com.saferent.service;
 
 import com.saferent.domain.ContactMessage;
 import com.saferent.exception.ResourceNotFoundException;
+import com.saferent.exception.message.ErrorMessage;
 import com.saferent.repository.ContactMessageRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +34,7 @@ public class ContactMessageService {
 
     public ContactMessage getContactMessage(Long id) {
         return contactMessageRepository.findById(id).orElseThrow(()->
-                new ResourceNotFoundException("Contact Message is not found with id: " + id));
+               // new ResourceNotFoundException("Contact Message is not found with id: " + id));
+                new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
     }
 }
