@@ -35,7 +35,7 @@ public class SafeRentExceptionHandler extends ResponseEntityExceptionHandler {
 
         return buildResponseEntity(error);
 
-        //ASDFAS
+
 
     }
 
