@@ -89,7 +89,7 @@ public class ContactMessageController {
 
     }
 
-    // !!! spesifik olarak bir ContactMessage RequestParam ile alalım
+    // !!! spesifik olarak bir ContactMessage RequestParam ile alalım.
     @GetMapping("/request")
     public ResponseEntity<ContactMessageDTO> getMessageWithRequestParam(
             @RequestParam("id") Long id) {
