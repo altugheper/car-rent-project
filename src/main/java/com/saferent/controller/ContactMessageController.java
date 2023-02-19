@@ -3,6 +3,7 @@ package com.saferent.controller;
 import com.saferent.domain.ContactMessage;
 import com.saferent.dto.ContactMessageDTO;
 import com.saferent.dto.request.ContactMessageRequest;
+import com.saferent.dto.response.ResponseMessage;
 import com.saferent.dto.response.SfResponse;
 import com.saferent.mapper.ContactMessageMapper;
 import com.saferent.service.ContactMessageService;
@@ -21,7 +22,7 @@ import java.util.List;
 @RequestMapping("/contactmessage")
 public class ContactMessageController {
 
-    // @Autowired
+    // @Autowired // field injection yapmamak icin commente alindi
     private final ContactMessageService contactMessageService;
 
     private final ContactMessageMapper contactMessageMapper;
@@ -71,10 +72,37 @@ public class ContactMessageController {
         return ResponseEntity.ok(pageDTO);
     }
 
+    // Tek bir data icin - PathVariable
+    // Birden fazla data - RequestParam
+
+    //!!! Delete islemi
+    @DeleteMapping("/{id}")
+    public ResponseEntity<SfResponse> deleteContactMessage(@PathVariable Long id){ // Tek data oldugu icin @PathVariable calisir, birden fazla data olsaydi @PathVariable("id") olmasi lazimdi
+        contactMessageService.deleteContactMessage(id);
+
+        SfResponse sfResponse = new SfResponse(ResponseMessage.CONTACTMESSAGE_DELETE_RESPONSE, true);
+
+        return ResponseEntity.ok(sfResponse);
+    }
+
+    //!!! Update
+    @PutMapping("/{id}")
+    public ResponseEntity<SfResponse> updateContactMessage(@PathVariable Long id,
+                                                           @Valid @RequestBody ContactMessageRequest contactMessageRequest){
+        ContactMessage contactMessage =
+                contactMessageMapper.contactMessageRequestToContactMessage(contactMessageRequest); //Pojo'yu DTO'ya cevirdim
+        contactMessageService.updateContactMessage(id,contactMessage);
+
+        SfResponse sfResponse = new SfResponse(ResponseMessage.CONTACTMESSAGE_UPDATE_RESPONSE, true);
+        return ResponseEntity.ok(sfResponse);
+    }
+
+
     // !!! getPageDTO
     private Page<ContactMessageDTO> getPageDTO(Page<ContactMessage> contactMessagePage){
         return contactMessagePage.map( // map methodu Page yapisindan geliyor
                 contactMessage -> contactMessageMapper.contactMessageToDTO(contactMessage));
+
     }
 
     // !!! spesifik olarak bir ContactMessage PathVariable ile alalım
@@ -99,4 +127,6 @@ public class ContactMessageController {
         return ResponseEntity.ok(contactMessageDTO);
 
     }
+
+
 }

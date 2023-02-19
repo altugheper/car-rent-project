@@ -1,6 +1,8 @@
 package com.saferent.exception;
 
 import com.saferent.exception.message.ApiResponseError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
@@ -23,7 +25,11 @@ public class SafeRentExceptionHandler extends ResponseEntityExceptionHandler {
         // AMACIM : custom bir exception sistemini kurmak, gelebilecek exceptionları
         // override ederek, istediğim yapıda cevap verilmesini sağlamak
 
+    Logger logger = LoggerFactory.getLogger(SafeRentExceptionHandler.class); // Factory Design Pattern kullanildi
+
     private ResponseEntity<Object> buildResponseEntity(ApiResponseError error) {
+        logger.error(error.getMessage()); // buildResponseEntity butun yarattigim customized exceptionlari return ettigi icin,
+                                            // bu methodun icine logger'i koyuyorum. Boylelikle her exception'a tek tek gidip logger koymama gerek kalmiyor
         return new ResponseEntity<>(error,error.getStatus());
     } // return'u kisaltmak icin olusturuldu
 
