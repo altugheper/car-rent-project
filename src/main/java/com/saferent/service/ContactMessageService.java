@@ -50,6 +50,6 @@ public class ContactMessageService {
         foundContactMessage.setSubject(contactMessage.getSubject());
         foundContactMessage.setEmail(contactMessage.getEmail());
 
-        contactMessageRepository.save(foundContactMessage);
+        contactMessageRepository.save(foundContactMessage); //1
     }
 }
