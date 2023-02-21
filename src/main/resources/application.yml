@@ -19,6 +19,7 @@ spring:
     properties:
       '[hibernate.format_sql]': true
 
+
 logging:
   file:
     name: log/saferent.log
@@ -28,6 +29,21 @@ logging:
     '[org.springframework.web]' : WARN
     '[org.hibernate]' : INFO
     '[com.saferent]' : DEBUG
+
+management: #actuator
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  info:
+    env:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+    shutdown:
+      enabled: true
+
 
 info:
   application:
