@@ -3,5 +3,6 @@ package com.saferent.exception.message;
 public class ErrorMessage {
 
     public final static String RESOURCE_NOT_FOUND_EXCEPTION = "Resource with id %s not found";
+    public final static String ROLE_NOT_FOUND_EXCEPTION = "Role : @s not found";
 
 }
