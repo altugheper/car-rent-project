@@ -14,18 +14,19 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    //!!! AMACIM: Encoder, Provider, AuthTokenFilter gibi yapilari olusturmak
+    // !!! AMACIM: Encoder,Provider ,AuthTokenFilter gibi yapıları oluşturmak
 
     @Autowired
     private UserDetailsService userDetailsService;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable().
                 sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
                 and().
@@ -36,21 +37,20 @@ public class SecurityConfig {
                         "/index.html").permitAll().
                 anyRequest().authenticated();
 
-        //!!! AuthTokenFilter yazdiktan sonra addFilter yazilacak
-
+        // !!! AuthTokenFilter yazdıktan sonra addFilter yazılacak
+        http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
-
     }
 
     // !!! Encoder
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
     }
 
-    //!!! Provider
+    // !!! Provider
     @Bean
-    public DaoAuthenticationProvider authProvider(){
+    public DaoAuthenticationProvider authProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
@@ -58,17 +58,17 @@ public class SecurityConfig {
         return authenticationProvider;
     }
 
-    //!!! AuthenticationManager
+    // !!! AuthenticationManager
     @Bean
-    public AuthenticationManager authManager(HttpSecurity http) throws Exception{
+    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class).
                 authenticationProvider(authProvider()).
                 build();
     }
 
-    //!!! AuthTokenFilter (JWT token ureten ve valide eden class)
+    // !!! AutTokenFilter ( JWT token üreten ve valide eden class )
     @Bean
-    public AuthTokenFilter authTokenFilter(){
+    public AuthTokenFilter authTokenFilter() {
         return new AuthTokenFilter();
     }
 }

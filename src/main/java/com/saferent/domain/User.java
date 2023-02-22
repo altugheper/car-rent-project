@@ -25,6 +25,9 @@ public class User {
     @Column(length = 50, nullable = false)
     private String firstName;
 
+    @Column(length = 50, nullable = false)
+    private String lastName;
+
     @Column(length = 50, nullable = false, unique = true)
     private String email;
 
@@ -36,6 +39,9 @@ public class User {
 
     @Column(length = 15, nullable = false)
     private String address;
+
+    @Column(length = 15)
+    private String zipCode;
 
     @Column(nullable = false)
     private Boolean builtIn = false; // admin tarafindan bile degistirilemez variable

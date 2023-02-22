@@ -1,8 +1,8 @@
 package com.saferent.security.jwt;
 
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.saferent.exception.message.ErrorMessage;
+import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +51,14 @@ public class JwtUtils {
 
     //!!! JWT validate
     public boolean validateJwtToken(String token){
-
+        try {
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token); //Code>Surround With>Collapse
+            return true;
+        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException |
+                 IllegalArgumentException e) {
+            logger.error(String.format(
+                    ErrorMessage.JWTTOKEN_ERROR_MESSAGE, e.getMessage()));
+        }
+        return false;
     }
 }
