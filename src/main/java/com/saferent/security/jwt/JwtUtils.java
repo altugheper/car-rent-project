@@ -1,58 +1,47 @@
 package com.saferent.security.jwt;
 
-
-import com.saferent.exception.message.ErrorMessage;
+import com.saferent.exception.message.*;
 import io.jsonwebtoken.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
+import org.slf4j.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.security.core.userdetails.*;
+import org.springframework.stereotype.*;
 
-import java.util.Date;
+import java.util.*;
 
 @Component
 public class JwtUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    /*
-    application.yml'a eklenen:
-    saferent:
-     app:
-      jwtSecret: safeRent@!10
-      jwtExpirationMs: 86400000
-     */
     @Value("${saferent.app.jwtSecret}")
-    private String jwtSecret;
-
+    private String jwtSecret ;
     @Value("${saferent.app.jwtExpirationMs}")
-    private Long jwtExpirationMs;
+    private Long jwtExpirationMs ;
 
-
-    //!!! Generate JWT token
+    // !!! generate JWT token
     public String generateJwtToken(UserDetails userDetails){
         return Jwts.builder().
                 setSubject(userDetails.getUsername()).
                 setIssuedAt(new Date()).
-                setExpiration(new Date(new Date().getTime() + jwtExpirationMs)). // 1 day expiration
+                setExpiration(new Date(new Date().getTime() + jwtExpirationMs)).
                 signWith(SignatureAlgorithm.HS512, jwtSecret).
                 compact();
     }
 
-    //!!! JWT token icinden email bilgisine ulasacagim method
+    // !!! JWT token içinden email bilgisine ulaşacağım method
     public String getEmailFromToken(String token){
         return Jwts.parser().setSigningKey(jwtSecret).
-                parseClaimsJwt(token).
+                parseClaimsJws(token).
                 getBody().
                 getSubject();
     }
 
 
-    //!!! JWT validate
+    // !!! JWT validate
     public boolean validateJwtToken(String token){
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token); //Code>Surround With>Collapse
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
             return true;
         } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException |
                  IllegalArgumentException e) {
@@ -61,4 +50,5 @@ public class JwtUtils {
         }
         return false;
     }
+
 }

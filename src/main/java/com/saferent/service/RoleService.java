@@ -1,12 +1,12 @@
 package com.saferent.service;
 
-import com.saferent.domain.Role;
-import com.saferent.domain.enums.RoleType;
-import com.saferent.exception.ResourceNotFoundException;
-import com.saferent.exception.message.ErrorMessage;
-import com.saferent.repository.RoleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.saferent.domain.*;
+import com.saferent.domain.enums.*;
+import com.saferent.exception.*;
+import com.saferent.exception.message.*;
+import com.saferent.repository.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.stereotype.*;
 
 @Service
 public class RoleService {
@@ -16,7 +16,9 @@ public class RoleService {
 
     public Role findByType(RoleType roleType){
         Role role = roleRepository.findByType(roleType).orElseThrow(()->
-                new ResourceNotFoundException(String.format(ErrorMessage.ROLE_NOT_FOUND_EXCEPTION,roleType.name())));
+                new ResourceNotFoundException(
+                        String.format(ErrorMessage.ROLE_NOT_FOUND_EXCEPTION, roleType.name())));
         return role;
     }
+
 }

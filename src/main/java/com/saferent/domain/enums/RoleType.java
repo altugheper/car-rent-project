@@ -2,8 +2,7 @@ package com.saferent.domain.enums;
 
 public enum RoleType {
 
-    ROLE_CUSTOMER("Customer"),
-
+    ROLE_CUSTOMER("Customer"),   //"Customer"
     ROLE_ADMIN("Administrator");
 
     private String name;
@@ -15,5 +14,4 @@ public enum RoleType {
     public String getName(){
         return name;
     }
-
 }

@@ -1,11 +1,10 @@
 package com.saferent.repository;
 
-import com.saferent.domain.User;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.saferent.domain.*;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.stereotype.*;
 
-import java.util.Optional;
+import java.util.*;
 
 @Repository // optional
 public interface UserRepository extends JpaRepository<User, Long> {

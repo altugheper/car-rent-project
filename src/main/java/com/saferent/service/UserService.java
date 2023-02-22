@@ -1,20 +1,18 @@
 package com.saferent.service;
 
+import com.saferent.domain.*;
 import com.saferent.domain.Role;
-import com.saferent.domain.User;
-import com.saferent.domain.enums.RoleType;
-import com.saferent.dto.request.RegisterRequest;
-import com.saferent.exception.ConflictException;
-import com.saferent.exception.ResourceNotFoundException;
-import com.saferent.exception.message.ErrorMessage;
-import com.saferent.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import com.saferent.domain.enums.*;
+import com.saferent.dto.request.*;
+import com.saferent.exception.*;
+import com.saferent.exception.message.*;
+import com.saferent.repository.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.context.annotation.*;
+import org.springframework.security.crypto.password.*;
+import org.springframework.stereotype.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -35,29 +33,31 @@ public class UserService {
     }
 
     public User getUserByEmail(String email){
-        User user = userRepository.findByEmail(email).orElseThrow(()->
-                new ResourceNotFoundException(String.format(ErrorMessage.USER_NOT_FOUND_EXCEPTION,email)));
+        User user = userRepository.findByEmail(email).orElseThrow(
+                ()-> new ResourceNotFoundException(
+                        String.format(ErrorMessage.USER_NOT_FOUND_EXCEPTION, email)));
         return user;
+
     }
 
-    public void saveUser(RegisterRequest registerRequest){
-        //!!! DTO'dan gelen email sistemde daha once var mi?
-        if (userRepository.existsByEmail(registerRequest.getEmail())){
-            throw new ConflictException(
-                    String.format(ErrorMessage.EMAIL_ALREADY_EXISTS_MESSAGE,
+    public void saveUser(RegisterRequest registerRequest) {
+        //!!! DTO dan gelen email sistemde daha önce var mı ???
+        if(userRepository.existsByEmail(registerRequest.getEmail())){
+            throw  new ConflictException(
+                    String.format(ErrorMessage.EMAIL_ALREADY_EXIST_MESSAGE,
                             registerRequest.getEmail())
             );
         }
 
-        //!!! Yeni user'in rol bilgisi default olarak customer atiyorum
+        // !!! yeni kullanıcın rol bilgisini default olarak customer atıyorum
         Role role = roleService.findByType(RoleType.ROLE_CUSTOMER);
         Set<Role> roles = new HashSet<>();
         roles.add(role);
 
-        //!!! DB'ye gitmedne once sifre encode edilecek
-        String encodedPassword = passwordEncoder.encode(registerRequest.getPassword());
+        //!!! Db ye gitmeden önce şifre encode edilecek
+        String encodedPassword= passwordEncoder.encode(registerRequest.getPassword());
 
-        //!!! Yeni User'dan gerekli bilgilerini setleyip DB'ye gonderiyorum
+        //!!! yeni kullanıcının gerekli bilgilerini setleyip DB ye gönderiyoruz
         User user = new User();
         user.setFirstName(registerRequest.getFirstName());
         user.setLastName(registerRequest.getLastName());
@@ -67,6 +67,8 @@ public class UserService {
         user.setAddress(registerRequest.getAddress());
         user.setZipCode(registerRequest.getZipCode());
         user.setRoles(roles);
-    }
 
+        userRepository.save(user);
+
+    }
 }

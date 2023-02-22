@@ -1,12 +1,11 @@
 package com.saferent.mapper;
 
-import com.saferent.domain.ContactMessage;
-import com.saferent.dto.ContactMessageDTO;
-import com.saferent.dto.request.ContactMessageRequest;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import com.saferent.domain.*;
+import com.saferent.dto.*;
+import com.saferent.dto.request.*;
+import org.mapstruct.*;
 
-import java.util.List;
+import java.util.*;
 
 @Mapper(componentModel = "spring") // herhangi bir sınıf enjekte edip kullanabilirim
 public interface ContactMessageMapper {

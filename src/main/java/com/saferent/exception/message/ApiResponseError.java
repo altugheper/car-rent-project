@@ -1,13 +1,15 @@
 package com.saferent.exception.message;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.http.HttpStatus;
+import com.fasterxml.jackson.annotation.*;
+import org.springframework.http.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
 public class ApiResponseError {
+    // AMACIM : custom error mesajlarının ana soblonunu ouşturmak
 
-    // AMACIM : custom error mesajlartının ana soblonunu ouşturmak
+
+
     private HttpStatus status;
 
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")

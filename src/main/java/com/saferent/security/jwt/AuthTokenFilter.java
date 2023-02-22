@@ -1,22 +1,16 @@
 package com.saferent.security.jwt;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.util.StringUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.slf4j.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.context.*;
+import org.springframework.security.core.userdetails.*;
+import org.springframework.util.*;
+import org.springframework.web.filter.*;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.io.*;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
 
@@ -28,28 +22,29 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
-
-        // request'in icinde JwtToken'i elde edecegim
+                                    FilterChain filterChain) throws ServletException,
+            IOException {
+        // requestin içinde JwtToken i elde edeceğiz
         String jwtToken = parseJwt(request);
 
         try {
-            if (jwtToken!=null && jwtUtils.validateJwtToken(jwtToken)){
+            if(jwtToken!=null && jwtUtils.validateJwtToken(jwtToken)) {
                 String email = jwtUtils.getEmailFromToken(jwtToken);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-                //!!! Valide edilen user bilgilerini SecurityContext'e gonderiyorum
+                // !!! Valide edilen user bilgilerini SecurityContext e gönderiyoruz
                 UsernamePasswordAuthenticationToken authenticationToken = new
                         UsernamePasswordAuthenticationToken(userDetails,
-                                                          null,
-                                                            userDetails.getAuthorities());
+                        null,
+                        userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         } catch (Exception e) {
-            logger.error("User Not Found{} : ",e.getMessage()); //Code>Surround With>try/catch
+            logger.error("User not Found{} : ", e.getMessage());
         }
         filterChain.doFilter(request,response);
 
@@ -58,16 +53,18 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private String parseJwt(HttpServletRequest request){
         String header = request.getHeader("Authorization");
 
-        if (StringUtils.hasText(header) && header.startsWith("Bearer ")){
+        if(StringUtils.hasText(header) && header.startsWith("Bearer ")) {
             return header.substring(7);
         }
+
         return null;
+
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         AntPathMatcher antPathMatcher = new AntPathMatcher();
-        return antPathMatcher.match("/register",request.getServletPath()) ||
+        return antPathMatcher.match("/register", request.getServletPath()) ||
                 antPathMatcher.match("/login", request.getServletPath());
     }
 }

@@ -1,37 +1,30 @@
 package com.saferent.exception;
 
-import com.saferent.exception.message.ApiResponseError;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.ConversionNotSupportedException;
-import org.springframework.beans.TypeMismatchException;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import com.saferent.exception.message.*;
+import org.slf4j.*;
+import org.springframework.beans.*;
+import org.springframework.http.*;
+import org.springframework.http.converter.*;
+import org.springframework.web.bind.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.*;
+import org.springframework.web.servlet.mvc.method.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.*;
 
 @ControllerAdvice // merkezi exception handle etmek için
 public class SafeRentExceptionHandler extends ResponseEntityExceptionHandler {
 
-        // AMACIM : custom bir exception sistemini kurmak, gelebilecek exceptionları
-        // override ederek, istediğim yapıda cevap verilmesini sağlamak
+    // AMACIM : custom bir exception sistemini kurmak, gelebilecek exceptionları
+    // override ederek, istediğim yapıda cevap verilmesini sağlamak
 
-    Logger logger = LoggerFactory.getLogger(SafeRentExceptionHandler.class); // Factory Design Pattern kullanildi
+    Logger logger = LoggerFactory.getLogger(SafeRentExceptionHandler.class);
 
     private ResponseEntity<Object> buildResponseEntity(ApiResponseError error) {
-        logger.error(error.getMessage()); // buildResponseEntity butun yarattigim customized exceptionlari return ettigi icin,
-                                            // bu methodun icine logger'i koyuyorum. Boylelikle her exception'a tek tek gidip logger koymama gerek kalmiyor
+        logger.error(error.getMessage());
         return new ResponseEntity<>(error,error.getStatus());
-    } // return'u kisaltmak icin olusturuldu
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     protected ResponseEntity<Object> handleResourceNotFoundException(
@@ -48,9 +41,9 @@ public class SafeRentExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ConflictException.class)
     protected ResponseEntity<Object> handleConflictException(
-            ConflictException ex, WebRequest request){
+            ConflictException ex, WebRequest request) {
         ApiResponseError error = new ApiResponseError(HttpStatus.CONFLICT,
-                                                        ex.getMessage(),
+                ex.getMessage(),
                 request.getDescription(false));
 
         return buildResponseEntity(error);
@@ -67,8 +60,7 @@ public class SafeRentExceptionHandler extends ResponseEntityExceptionHandler {
 
         ApiResponseError error = new ApiResponseError(HttpStatus.BAD_REQUEST,
                 errors.get(0).toString(),
-                request.getDescription(false));
-
+                request.getDescription(false))  ;
         return buildResponseEntity(error);
     }
 
@@ -76,20 +68,17 @@ public class SafeRentExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         ApiResponseError error = new ApiResponseError(HttpStatus.BAD_REQUEST,
                 ex.getMessage(),
-                request.getDescription(false)
-        );
-
+                request.getDescription(false))  ;
         return buildResponseEntity(error);
     }
 
-
     @Override
     protected ResponseEntity<Object> handleConversionNotSupported(ConversionNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        ApiResponseError error = new ApiResponseError(HttpStatus.INTERNAL_SERVER_ERROR,
-                ex.getMessage(),
-                request.getDescription(false)
-        );
 
+        ApiResponseError error = new ApiResponseError(HttpStatus.INTERNAL_SERVER_ERROR
+                ,
+                ex.getMessage(),
+                request.getDescription(false))  ;
         return buildResponseEntity(error);
     }
 
@@ -97,33 +86,23 @@ public class SafeRentExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         ApiResponseError error = new ApiResponseError(HttpStatus.BAD_REQUEST,
                 ex.getMessage(),
-                request.getDescription(false)
-        );
-
+                request.getDescription(false))  ;
         return buildResponseEntity(error);
     }
 
 
 
-
-
-    // Run-time Exception handler
     @ExceptionHandler(RuntimeException.class)
-    protected ResponseEntity<Object> handleRuntimeException(
-            RuntimeException ex, WebRequest request){
+    protected ResponseEntity<Object> handleRuntimeException(RuntimeException ex, WebRequest request) {
 
         ApiResponseError error = new ApiResponseError(HttpStatus.INTERNAL_SERVER_ERROR,
                 ex.getMessage(),
                 request.getDescription(false));
-
         return buildResponseEntity(error);
     }
 
-
-    // General Exception handler (Parent of Runtime exception)
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<Object> handleGeneralException(
-            Exception ex, WebRequest request){
+    protected ResponseEntity<Object> handleGeneralException( Exception ex, WebRequest request) {
 
         ApiResponseError error = new ApiResponseError(HttpStatus.INTERNAL_SERVER_ERROR,
                 ex.getMessage(),
@@ -131,6 +110,9 @@ public class SafeRentExceptionHandler extends ResponseEntityExceptionHandler {
 
         return buildResponseEntity(error);
     }
+
+
+
 
 
 

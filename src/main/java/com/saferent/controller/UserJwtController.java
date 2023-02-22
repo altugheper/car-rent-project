@@ -1,24 +1,19 @@
 package com.saferent.controller;
 
-import com.saferent.dto.request.RegisterRequest;
-import com.saferent.dto.response.ResponseMessage;
-import com.saferent.dto.response.SfResponse;
-import com.saferent.security.jwt.JwtUtils;
-import com.saferent.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import com.saferent.dto.request.*;
+import com.saferent.dto.response.*;
+import com.saferent.security.jwt.*;
+import com.saferent.service.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.http.*;
+import org.springframework.security.authentication.*;
+import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import javax.validation.*;
 
 @RestController
 public class UserJwtController {
-    //!!! Bu class'da sadece Login ve Register islemleri yapilacak
-
+    // !!! Bu class'da sadece Login ve Register işlemleri yapılacak
     @Autowired
     private JwtUtils jwtUtils;
 
@@ -38,6 +33,6 @@ public class UserJwtController {
         response.setMessage(ResponseMessage.REGISTER_RESPONSE_MESSAGE);
         response.setSuccess(true);
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
 }

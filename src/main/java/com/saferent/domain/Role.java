@@ -1,10 +1,7 @@
 package com.saferent.domain;
 
-import com.saferent.domain.enums.RoleType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.saferent.domain.enums.*;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -14,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 
 @Entity
-@Table(name = "t_role")
+@Table(name="t_role")
 public class Role {
 
     @Id

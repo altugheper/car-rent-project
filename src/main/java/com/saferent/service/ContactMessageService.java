@@ -1,14 +1,13 @@
 package com.saferent.service;
 
-import com.saferent.domain.ContactMessage;
-import com.saferent.exception.ResourceNotFoundException;
-import com.saferent.exception.message.ErrorMessage;
-import com.saferent.repository.ContactMessageRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
+import com.saferent.domain.*;
+import com.saferent.exception.*;
+import com.saferent.exception.message.*;
+import com.saferent.repository.*;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.*;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ContactMessageService {
@@ -19,12 +18,13 @@ public class ContactMessageService {
         this.contactMessageRepository = contactMessageRepository;
     }
 
+
     public void saveMessage(ContactMessage contactMessage) {
         contactMessageRepository.save(contactMessage);
     }
 
-
     public List<ContactMessage> getAll() {
+
         return contactMessageRepository.findAll();
     }
 
@@ -33,9 +33,11 @@ public class ContactMessageService {
     }
 
     public ContactMessage getContactMessage(Long id) {
+
         return contactMessageRepository.findById(id).orElseThrow(()->
-               // new ResourceNotFoundException("Contact Message is not found with id: " + id));
-                new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
+                // new ResourceNotFoundException("ContactMessage isn't found with id :" + id) );
+                new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id))
+        );
     }
 
     public void deleteContactMessage(Long id) {
@@ -45,11 +47,12 @@ public class ContactMessageService {
 
     public void updateContactMessage(Long id, ContactMessage contactMessage) {
         ContactMessage foundContactMessage = getContactMessage(id);
+
         foundContactMessage.setName(contactMessage.getName());
         foundContactMessage.setBody(contactMessage.getBody());
-        foundContactMessage.setSubject(contactMessage.getSubject());
         foundContactMessage.setEmail(contactMessage.getEmail());
+        foundContactMessage.setSubject(contactMessage.getSubject());
 
-        contactMessageRepository.save(foundContactMessage); //1
+        contactMessageRepository.save(foundContactMessage);
     }
 }
