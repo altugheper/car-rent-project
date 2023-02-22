@@ -50,5 +50,7 @@ public class JwtUtils {
 
 
     //!!! JWT validate
+    public boolean validateJwtToken(String token){
 
+    }
 }
