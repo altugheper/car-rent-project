@@ -29,5 +29,14 @@ public class UserController {
         return ResponseEntity.ok(allUsers);
     }
 
+    //!!! Sisteme giris yapan User'in bilgisi
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('CUSTOMER')")
+    public ResponseEntity<UserDTO> getUser(){
+        UserDTO userDTO = userService.getPrincipal();
+
+        return ResponseEntity.ok(userDTO);
+    }
+
 
 }

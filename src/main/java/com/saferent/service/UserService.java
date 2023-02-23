@@ -9,6 +9,7 @@ import com.saferent.exception.*;
 import com.saferent.exception.message.*;
 import com.saferent.mapper.UserMapper;
 import com.saferent.repository.*;
+import com.saferent.security.SecurityUtils;
 import org.springframework.context.annotation.*;
 import org.springframework.security.crypto.password.*;
 import org.springframework.stereotype.*;
@@ -76,9 +77,25 @@ public class UserService {
 
     }
 
+    // !!! getAllUser
     public List<UserDTO> getAllUsers() {
         List<User> users =  userRepository.findAll();
         List<UserDTO> userDTOs = userMapper.map(users);
         return userDTOs;
+    }
+
+    //!!! Sisteme giris yapan User'in bilgisi
+    public UserDTO getPrincipal() {
+        User user = getCurrentUser();
+        UserDTO userDTO = userMapper.userToUserDTO(user);
+        return userDTO;
+    }
+
+    public User getCurrentUser(){
+        String email = SecurityUtils.getCurrentUserLogin().orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.PRINCIPAL_FOUND_MESSAGE));
+        User user = getUserByEmail(email);
+
+        return user;
     }
 }
