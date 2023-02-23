@@ -7,6 +7,8 @@ import com.saferent.service.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.*;
 import org.springframework.security.authentication.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.*;
@@ -34,5 +36,25 @@ public class UserJwtController {
         response.setSuccess(true);
 
         return new ResponseEntity<>(response,HttpStatus.CREATED);
+    }
+
+    //!!! Login
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> authenticate(@Valid
+                                                      @RequestBody LoginRequest loginRequest){
+
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
+                        loginRequest.getPassword());
+
+        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+
+        //!!! User bu asamada valide edildi ve token uretimine geciliyor
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String jwtToken = jwtUtils.generateJwtToken(userDetails);
+        // JWT token client tarafina gonderiliyor
+        LoginResponse loginResponse = new LoginResponse(jwtToken);
+
+        return new ResponseEntity<>(loginResponse,HttpStatus.OK);
     }
 }
