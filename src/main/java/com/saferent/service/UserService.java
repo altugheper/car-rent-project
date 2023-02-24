@@ -11,6 +11,8 @@ import com.saferent.mapper.UserMapper;
 import com.saferent.repository.*;
 import com.saferent.security.SecurityUtils;
 import org.springframework.context.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.*;
 import org.springframework.stereotype.*;
 
@@ -97,5 +99,24 @@ public class UserService {
         User user = getUserByEmail(email);
 
         return user;
+    }
+
+    public Page<UserDTO> getUserPage(Pageable pageable) {
+
+        Page<User> userPage = userRepository.findAll(pageable);
+        return getUserDTOPage(userPage);
+    }
+
+    private Page<UserDTO> getUserDTOPage(Page<User> userPage){
+        return userPage.map(
+                user -> userMapper.userToUserDTO(user));
+    }
+
+    public UserDTO getUserById(Long id) {
+
+        User user = userRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
+
+        return userMapper.userToUserDTO(user);
     }
 }
