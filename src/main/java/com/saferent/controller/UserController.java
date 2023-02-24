@@ -1,6 +1,9 @@
 package com.saferent.controller;
 
 import com.saferent.dto.UserDTO;
+import com.saferent.dto.request.UpdatePasswordRequest;
+import com.saferent.dto.response.ResponseMessage;
+import com.saferent.dto.response.SfResponse;
 import com.saferent.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -62,6 +66,21 @@ public class UserController {
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id){
         UserDTO userDTO = userService.getUserById(id);
         return ResponseEntity.ok(userDTO);
+    }
+
+    //!!! Update Password
+    @PatchMapping("/auth")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('CUSTOMER')")
+    public ResponseEntity<SfResponse> updatePassword(@Valid
+                                                         @RequestBody UpdatePasswordRequest updatePasswordRequest){
+
+        userService.updatePassword(updatePasswordRequest);
+
+        SfResponse response = new SfResponse();
+        response.setMessage(ResponseMessage.PASSWORD_CHANGED_RESPONSE_MESSAGE);
+        response.setSuccess(true);
+
+        return ResponseEntity.ok(response);
     }
 
 }

@@ -119,4 +119,26 @@ public class UserService {
 
         return userMapper.userToUserDTO(user);
     }
+
+    public void updatePassword(UpdatePasswordRequest updatePasswordRequest) {
+
+        User user = getCurrentUser();
+
+        //!!! builtIn?
+        if (user.getBuiltIn()){
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+        //!!! Forma girilen OldPassword dogru mu
+        if (!passwordEncoder.matches(updatePasswordRequest.getOldPassword(),user.getPassword())){
+            throw new BadRequestException(ErrorMessage.PASSWORD_NOT_MATCHED_MESSAGE);
+        }
+
+        //!!! yeni gelen sifreyi encode edilecek
+        String hashedPassword =passwordEncoder.encode(updatePasswordRequest.getNewPassword());
+        user.setPassword(hashedPassword);
+
+        userRepository.save(user);
+    }
+
+
 }
