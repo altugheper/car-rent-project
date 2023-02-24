@@ -2,6 +2,7 @@ package com.saferent.controller;
 
 import com.saferent.dto.UserDTO;
 import com.saferent.dto.request.UpdatePasswordRequest;
+import com.saferent.dto.request.UserUpdateRequest;
 import com.saferent.dto.response.ResponseMessage;
 import com.saferent.dto.response.SfResponse;
 import com.saferent.service.UserService;
@@ -78,6 +79,20 @@ public class UserController {
 
         SfResponse response = new SfResponse();
         response.setMessage(ResponseMessage.PASSWORD_CHANGED_RESPONSE_MESSAGE);
+        response.setSuccess(true);
+
+        return ResponseEntity.ok(response);
+    }
+
+    //!!! Update User
+    @PutMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('CUSTOMER')")
+    public ResponseEntity<SfResponse> updateUser(
+            @Valid @RequestBody UserUpdateRequest userUpdateRequest){
+        userService.updateUser(userUpdateRequest);
+
+        SfResponse response = new SfResponse();
+        response.setMessage(ResponseMessage.USER_UPDATE_RESPONSE_MESSAGE);
         response.setSuccess(true);
 
         return ResponseEntity.ok(response);

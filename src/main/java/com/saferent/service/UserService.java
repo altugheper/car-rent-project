@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.*;
 import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -141,4 +142,26 @@ public class UserService {
     }
 
 
+    @Transactional
+    public void updateUser(UserUpdateRequest userUpdateRequest) {
+        User user = getCurrentUser();
+        // !!! builtIn ???
+        if(user.getBuiltIn()){
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+        // !!! email kontrol
+        boolean emailExist = userRepository.existsByEmail(userUpdateRequest.getEmail());
+        if(emailExist && !userUpdateRequest.getEmail().equals(user.getEmail())) {
+            throw new ConflictException(
+                    String.format(ErrorMessage.EMAIL_ALREADY_EXIST_MESSAGE,userUpdateRequest.getEmail()));
+        }
+
+        userRepository.update(user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getPhoneNumber(),
+                user.getEmail(),
+                user.getAddress(),
+                user.getZipCode());
+    }
 }
