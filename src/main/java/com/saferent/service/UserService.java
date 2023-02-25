@@ -217,7 +217,7 @@ public class UserService {
                     roles.add(adminRole); // ROLE_ADMIN
                 } else {
                     Role userRole = roleService.findByType(RoleType.ROLE_CUSTOMER);
-                    roles.add(userRole);
+                    roles.add(userRole); // ROLE_CUSTOMER
                 }
             });
         }
@@ -229,6 +229,18 @@ public class UserService {
                 new ResourceNotFoundException(
                         String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION,id)));
         return user;
+
+    }
+
+    public void removeUserById(Long id) {
+        User user = getById(id);
+
+        // !!! builtIn
+        if(user.getBuiltIn()){
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+        userRepository.deleteById(id);
 
     }
 }
