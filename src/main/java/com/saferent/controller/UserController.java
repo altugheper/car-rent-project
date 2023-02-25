@@ -1,6 +1,7 @@
 package com.saferent.controller;
 
 import com.saferent.dto.UserDTO;
+import com.saferent.dto.request.AdminUserUpdateRequest;
 import com.saferent.dto.request.UpdatePasswordRequest;
 import com.saferent.dto.request.UserUpdateRequest;
 import com.saferent.dto.response.ResponseMessage;
@@ -97,5 +98,21 @@ public class UserController {
 
         return ResponseEntity.ok(response);
     }
+
+    //!!! Admin User Update
+    @PutMapping("/{id}/auth")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<SfResponse> updateUserAuth(@PathVariable Long id,
+                                                     @Valid @RequestBody AdminUserUpdateRequest adminUserUpdateRequest){
+        userService.updateUserAuth(id,adminUserUpdateRequest);
+
+        SfResponse response = new SfResponse();
+        response.setMessage(ResponseMessage.USER_UPDATE_RESPONSE_MESSAGE);
+        response.setSuccess(true);
+
+        return ResponseEntity.ok(response);
+    }
+
+
 
 }

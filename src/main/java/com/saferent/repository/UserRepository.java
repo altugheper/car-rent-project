@@ -37,4 +37,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
                 @Param("email") String email,
                 @Param("address") String address,
                 @Param("zipCode") String zipCode);
+
+    @EntityGraph(attributePaths = "id") // Bana rolleri getirme
+    Optional<User> findUserById(Long id);
+
 }
+
+
