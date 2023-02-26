@@ -11,6 +11,6 @@ public class ImageFileController {
     private final ImageFileService imageFileService;
 
     public ImageFileController(ImageFileService imageFileService) {
-        this.imageFileService = imageFileService;
+        this.imageFileService = imageFileService; //1
     }
 }
