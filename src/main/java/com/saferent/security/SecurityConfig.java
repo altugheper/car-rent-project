@@ -33,6 +33,8 @@ public class SecurityConfig {
                 antMatchers("/login",
                         "/register",
                         "/",
+                        "/files/download/**",
+                        "/files/display/**",
                         "/index.html").permitAll().
                 anyRequest().authenticated();
 

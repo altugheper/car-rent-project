@@ -31,7 +31,7 @@ public class ImageFile {
     @OneToOne(cascade = CascadeType.ALL)
     private ImageData imageData;
 
-    public ImageFile(String name, String type, ImageData imageData, long length){ // length bilgisini ImageData'daki data variable'indan aliniyor
+    public ImageFile(String name,String type,ImageData imageData){ // length bilgisini ImageData'daki data variable'indan aliniyor
         this.name=name;
         this.type=type;
         this.imageData=imageData;
