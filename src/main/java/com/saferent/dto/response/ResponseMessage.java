@@ -9,4 +9,6 @@ public class ResponseMessage { // Butun response message'lar buradan gidecek
     public final static String USER_DELETE_RESPONSE_MESSAGE = "User Successfully Deleted";
     public final static String IMAGE_SAVED_RESPONSE_MESSAGE = "ImageFile Successfully Saved";
     public final static String IMAGE_DELETED_RESPONSE_MESSAGE = "ImageFile Successfully Deleted";
+
+    public final static String CAR_SAVED_RESPONSE_MESSAGE = "Car Successfully Saved";
 }
