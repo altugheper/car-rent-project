@@ -22,7 +22,7 @@ public class ImageFileController {
     }
 
     //!!! ************ Upload **********
-    // imageId : d11fe005-9700-428a-9828-1dbedb10c002
+    // imageId : 690e0112-d460-4053-bbb0-ee224c4bbe2a
     @PostMapping("/upload")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ImageSavedResponse> uploadFile(
