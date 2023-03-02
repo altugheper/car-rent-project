@@ -1,5 +1,6 @@
 package com.saferent.domain;
 
+import com.saferent.domain.enums.ReservationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,5 +34,7 @@ public class Reservation {
     private String pickUpLocation;
 
     private String dropOfLocation;
+
+    private ReservationStatus status;
 
 }
