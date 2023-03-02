@@ -30,5 +30,8 @@ public class Reservation {
 
     private LocalDateTime dropOfTime;
 
+    private String pickUpLocation;
+
+    private String dropOfLocation;
 
 }
