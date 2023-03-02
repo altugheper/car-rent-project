@@ -6,5 +6,5 @@ public enum ReservationStatus {
 
     CANCELED,
 
-    DONE
+    DONE;
 }
