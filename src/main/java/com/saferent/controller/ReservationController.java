@@ -25,26 +25,47 @@ public class ReservationController {
 
     private final UserService userService;
 
-    public ReservationController(ReservationService reservationService, CarService carService, UserService userService) {
+    private final ReservationRequest reservationRequest;
+
+    public ReservationController(ReservationService reservationService, CarService carService, UserService userService, ReservationRequest reservationRequest) {
         this.reservationService = reservationService;
         this.carService = carService;
         this.userService = userService;
+        this.reservationRequest = reservationRequest;
     }
 
-    //!!! make Reservation
+    // !!! make Reservation
     @PostMapping("/add")
     @PreAuthorize("hasRole('ADMIN') or hasRole('CUSTOMER')")
     public ResponseEntity<SfResponse> makeReservation(@RequestParam("carId") Long carId,
-                                                      @Valid @RequestBody ReservationRequest reservationRequest){
+                                                      @Valid @RequestBody ReservationRequest reservationRequest) {
 
         Car car = carService.getCarById(carId);
         User user = userService.getCurrentUser();
 
-    reservationService.createReservation(reservationRequest, user, car);
+        reservationService.createReservation(reservationRequest, user, car);
 
-    SfResponse response = new SfResponse(ResponseMessage.RESERVATION_CREATED_RESPONSE_MESSAGE, true);
+        SfResponse response =
+                new SfResponse(ResponseMessage.RESERVATION_CREATED_RESPONSE_MESSAGE, true);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
 
-    return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    //!!! AdminMakeReservation
+    @PostMapping("/add/auth")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<SfResponse> addReservation(
+            @RequestParam("userId") Long userId,
+            @RequestParam("carId") Long carId,
+            @Valid @RequestBody ReservationRequest reservationRequest){
+
+        Car car = carService.getCarById(carId);
+        User user = userService.getById(userId);
+
+        reservationService.createReservation(reservationRequest,user,car);
+        SfResponse response =
+                new SfResponse(ResponseMessage.RESERVATION_CREATED_RESPONSE_MESSAGE, true);
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
 
     }
 }

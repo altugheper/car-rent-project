@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    @Query("SELECT r FROM Reservationm r " +
+    @Query("SELECT r FROM Reservation r " +
             "JOIN FETCH Car c on r.car=c.id WHERE " +
             "c.id=:carId AND (r.status NOT IN :status) AND :pickUpTime BETWEEN r.pickUpTime and r.dropOfTime " +
             "OR " +

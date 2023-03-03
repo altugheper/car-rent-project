@@ -7,6 +7,7 @@ import com.saferent.domain.enums.ReservationStatus;
 import com.saferent.dto.request.ReservationRequest;
 import com.saferent.exception.BadRequestException;
 import com.saferent.exception.message.ErrorMessage;
+import com.saferent.mapper.ReservationMapper;
 import com.saferent.repository.ReservationRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,20 +19,37 @@ import java.util.List;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
+    private final ReservationMapper reservationMapper;
 
-    public ReservationService(ReservationRepository reservationRepository) {
+    public ReservationService(ReservationRepository reservationRepository, ReservationMapper reservationMapper) {
         this.reservationRepository = reservationRepository;
+        this.reservationMapper = reservationMapper;
     }
 
     public void createReservation(ReservationRequest reservationRequest, User user, Car car) {
 
         checkReservationTimeIsCorrect(reservationRequest.getPickUpTime(), reservationRequest.getDropOfTime());
 
-        boolean carStatus = checkCarAvailibility(car, reservationRequest.getPickUpTime(),reservationRequest.getDropOfTime());
+        boolean carStatus = checkCarAvailability(car , reservationRequest.getPickUpTime(), reservationRequest.getDropOfTime());
 
+        Reservation reservation = reservationMapper.reservationRequestToReservation(reservationRequest);
+
+        if(carStatus){
+            reservation.setStatus(ReservationStatus.CREATED);
+        } else {
+            throw new BadRequestException(ErrorMessage.CAR_NOT_AVAILABLE_MESSAGE);
+        }
+        reservation.setCar(car);
+        reservation.setUser(user);
+
+        Double totalPrice = getTotalPrice(car, reservationRequest.getPickUpTime(),reservationRequest.getDropOfTime());
+
+        reservation.setTotalPrice(totalPrice);
+
+        reservationRepository.save(reservation);
 
     }
-    //!!! Istenen rezervasyon tarihleri dogru mu?
+    // !!! Istenen rezervasyon tarihleri doğru mu ???
     private void checkReservationTimeIsCorrect(LocalDateTime pickUpTime,
                                                LocalDateTime dropOfTime){
         LocalDateTime now = LocalDateTime.now();
@@ -40,7 +58,7 @@ public class ReservationService {
             throw new BadRequestException(ErrorMessage.RESERVATION_TIME_INCORRECT_MESSAGE);
         }
 
-        //!!! baş. tarihi ve bitiş tarihi biribirine eşit mi
+        //!!! baç. tarihi ve bitiş tarihi biribirine eşit mi
         boolean isEqual = pickUpTime.isEqual(dropOfTime)?true:false;
         // !!! baş. tarihi, bitiş tarihinin öncesinde mi
         boolean isBefore = pickUpTime.isBefore(dropOfTime)?true:false; // !!!
@@ -51,9 +69,9 @@ public class ReservationService {
 
     }
 
-    //!!! Reserve edilen araca musait mi?
-    private boolean checkCarAvailibility(Car car, LocalDateTime pickUpTime,
-                                         LocalDateTime dropOfTime){
+    // !!! Araç müsait mi ???
+    private boolean checkCarAvailability(Car car,LocalDateTime pickUpTime,
+                                         LocalDateTime dropOfTime) {
 
         List<Reservation> existReservations = getConflictReservations(car,pickUpTime,dropOfTime);
 
@@ -61,22 +79,23 @@ public class ReservationService {
 
     }
 
-    //!!! Fiyat hesaplamasi
-    private Double getTotalPrice(Car car, LocalDateTime pickUpTime,
+    // !!! Fiyat Hesaplaması
+    private Double getTotalPrice(Car car,LocalDateTime pickUpTime,
                                  LocalDateTime dropOfTime){
-        Long minutes = ChronoUnit.MINUTES.between(pickUpTime, dropOfTime);
-        double hours = Math.ceil(minutes/60/0);
+        Long minutes =  ChronoUnit.MINUTES.between(pickUpTime,dropOfTime);
+        double hours = Math.ceil(minutes/60.0);
         return car.getPricePerHour() * hours;
 
     }
 
-    // Rezervasyonlar arasi cakisma var mi?
-    private List<Reservation> getConflictReservations(Car car, LocalDateTime pickUpTime, LocalDateTime dropOfTime){
-        if (pickUpTime.isAfter(dropOfTime)){
-            throw new BadRequestException(ErrorMessage.RESERVATION_TIME_INCORRECT_MESSAGE);
+    // !!! Reservasyonlar arası çakışma var mı ???
+    private List<Reservation> getConflictReservations(Car car,LocalDateTime pickUpTime,
+                                                      LocalDateTime dropOfTime ){
+        if(pickUpTime.isAfter(dropOfTime)){
+            throw  new BadRequestException(ErrorMessage.RESERVATION_TIME_INCORRECT_MESSAGE);
         }
 
-        ReservationStatus[] status = {ReservationStatus.CANCELED, ReservationStatus.DONE};
+        ReservationStatus[] status = {ReservationStatus.CANCELED,ReservationStatus.DONE};
 
         List<Reservation> existReservation =
                 reservationRepository.checkCarStatus(car.getId(),pickUpTime,dropOfTime,status);
