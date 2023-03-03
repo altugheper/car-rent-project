@@ -25,9 +25,12 @@ public class Reservation {
     private Long id;
 
     @OneToOne
+    //!!! Reservation table'indaki car_id ile Car table'indaki id header eslestirdim
+    @JoinColumn(name = "car_id", referencedColumnName = "id")
     private Car car;
 
     @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @Column(nullable = false)
