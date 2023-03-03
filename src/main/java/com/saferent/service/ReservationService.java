@@ -11,6 +11,7 @@ import com.saferent.repository.ReservationRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -24,6 +25,9 @@ public class ReservationService {
 
     public void createReservation(ReservationRequest reservationRequest, User user, Car car) {
 
+        checkReservationTimeIsCorrect(reservationRequest.getPickUpTime(), reservationRequest.getDropOfTime());
+
+        boolean carStatus = checkCarAvailibility(car, reservationRequest.getPickUpTime(),reservationRequest.getDropOfTime());
 
 
     }
@@ -48,9 +52,23 @@ public class ReservationService {
     }
 
     //!!! Reserve edilen araca musait mi?
+    private boolean checkCarAvailibility(Car car, LocalDateTime pickUpTime,
+                                         LocalDateTime dropOfTime){
 
+        List<Reservation> existReservations = getConflictReservations(car,pickUpTime,dropOfTime);
+
+        return existReservations.isEmpty();
+
+    }
 
     //!!! Fiyat hesaplamasi
+    private Double getTotalPrice(Car car, LocalDateTime pickUpTime,
+                                 LocalDateTime dropOfTime){
+        Long minutes = ChronoUnit.MINUTES.between(pickUpTime, dropOfTime);
+        double hours = Math.ceil(minutes/60/0);
+        return car.getPricePerHour() * hours;
+
+    }
 
     // Rezervasyonlar arasi cakisma var mi?
     private List<Reservation> getConflictReservations(Car car, LocalDateTime pickUpTime, LocalDateTime dropOfTime){
