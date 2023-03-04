@@ -2,11 +2,13 @@ package com.saferent.repository;
 
 import com.saferent.domain.Reservation;
 import com.saferent.domain.enums.ReservationStatus;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.Entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,4 +26,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                                      @Param("pickUpTime") LocalDateTime pickUpTime,
                                      @Param("dropOfTime") LocalDateTime dropOfTime,
                                      @Param("status") ReservationStatus[] status);
+
+    @EntityGraph(attributePaths = {"car", "car.image"})
+    List<Reservation> findAll();
 }
+
+

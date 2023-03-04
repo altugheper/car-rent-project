@@ -511,3 +511,47 @@ Caused by: org.hibernate.hql.internal.ast.QuerySyntaxException: Reservationm is 
 2023-03-03 22:00:25,535 INFO  [SpringApplicationShutdownHook] org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean:Closing JPA EntityManagerFactory for persistence unit 'default'
 2023-03-03 22:00:25,538 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource:HikariPool-1 - Shutdown initiated...
 2023-03-03 22:00:25,541 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource:HikariPool-1 - Shutdown completed.
+2023-03-03 22:10:32,943 INFO  [restartedMain] com.saferent.SaferentApplication:Starting SaferentApplication using Java 17.0.4.1 on DESKTOP-41NQQE6 with PID 17396 (C:\Users\altug\IdeaProjects\saferent\target\classes started by altug in C:\Users\altug\IdeaProjects\saferent)
+2023-03-03 22:10:32,944 DEBUG [restartedMain] com.saferent.SaferentApplication:Running with Spring Boot v2.7.8, Spring v5.3.25
+2023-03-03 22:10:32,944 INFO  [restartedMain] com.saferent.SaferentApplication:No active profile set, falling back to 1 default profile: "default"
+2023-03-03 22:10:32,977 INFO  [restartedMain] org.springframework.boot.devtools.env.DevToolsPropertyDefaultsPostProcessor:Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2023-03-03 22:10:32,977 INFO  [restartedMain] org.springframework.boot.devtools.env.DevToolsPropertyDefaultsPostProcessor:For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2023-03-03 22:10:33,734 INFO  [restartedMain] org.springframework.data.repository.config.RepositoryConfigurationDelegate:Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-03-03 22:10:33,823 INFO  [restartedMain] org.springframework.data.repository.config.RepositoryConfigurationDelegate:Finished Spring Data repository scanning in 81 ms. Found 6 JPA repository interfaces.
+2023-03-03 22:10:34,420 INFO  [restartedMain] org.springframework.boot.web.embedded.tomcat.TomcatWebServer:Tomcat initialized with port(s): 8080 (http)
+2023-03-03 22:10:34,430 INFO  [restartedMain] org.apache.catalina.core.StandardService:Starting service [Tomcat]
+2023-03-03 22:10:34,431 INFO  [restartedMain] org.apache.catalina.core.StandardEngine:Starting Servlet engine: [Apache Tomcat/9.0.71]
+2023-03-03 22:10:34,507 INFO  [restartedMain] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]:Initializing Spring embedded WebApplicationContext
+2023-03-03 22:10:34,507 INFO  [restartedMain] org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext:Root WebApplicationContext: initialization completed in 1530 ms
+2023-03-03 22:10:34,786 INFO  [restartedMain] org.hibernate.jpa.internal.util.LogHelper:HHH000204: Processing PersistenceUnitInfo [name: default]
+2023-03-03 22:10:34,827 INFO  [restartedMain] org.hibernate.Version:HHH000412: Hibernate ORM core version 5.6.14.Final
+2023-03-03 22:10:34,963 INFO  [restartedMain] org.hibernate.annotations.common.Version:HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2023-03-03 22:10:35,045 INFO  [restartedMain] com.zaxxer.hikari.HikariDataSource:HikariPool-1 - Starting...
+2023-03-03 22:10:35,276 INFO  [restartedMain] com.zaxxer.hikari.HikariDataSource:HikariPool-1 - Start completed.
+2023-03-03 22:10:35,288 INFO  [restartedMain] org.hibernate.dialect.Dialect:HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2023-03-03 22:10:35,987 INFO  [restartedMain] org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator:HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2023-03-03 22:10:35,992 INFO  [restartedMain] org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean:Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-03-03 22:10:36,372 DEBUG [restartedMain] com.saferent.security.jwt.AuthTokenFilter:Filter 'authTokenFilter' configured for use
+2023-03-03 22:10:36,507 WARN  [restartedMain] org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext:Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'reservationController' defined in file [C:\Users\altug\IdeaProjects\saferent\target\classes\com\saferent\controller\ReservationController.class]: Unsatisfied dependency expressed through constructor parameter 3; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'com.saferent.dto.request.ReservationRequest' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+2023-03-03 22:10:36,508 INFO  [restartedMain] org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean:Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-03-03 22:10:36,510 INFO  [restartedMain] com.zaxxer.hikari.HikariDataSource:HikariPool-1 - Shutdown initiated...
+2023-03-03 22:10:36,513 INFO  [restartedMain] com.zaxxer.hikari.HikariDataSource:HikariPool-1 - Shutdown completed.
+2023-03-03 22:10:36,517 INFO  [restartedMain] org.apache.catalina.core.StandardService:Stopping service [Tomcat]
+2023-03-03 22:10:36,528 INFO  [restartedMain] org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener:
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2023-03-03 22:10:36,545 ERROR [restartedMain] org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter:
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 3 of constructor in com.saferent.controller.ReservationController required a bean of type 'com.saferent.dto.request.ReservationRequest' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'com.saferent.dto.request.ReservationRequest' in your configuration.
+

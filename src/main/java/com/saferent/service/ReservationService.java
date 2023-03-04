@@ -4,11 +4,15 @@ import com.saferent.domain.Car;
 import com.saferent.domain.Reservation;
 import com.saferent.domain.User;
 import com.saferent.domain.enums.ReservationStatus;
+import com.saferent.dto.ReservationDTO;
 import com.saferent.dto.request.ReservationRequest;
 import com.saferent.exception.BadRequestException;
 import com.saferent.exception.message.ErrorMessage;
 import com.saferent.mapper.ReservationMapper;
 import com.saferent.repository.ReservationRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -101,5 +105,15 @@ public class ReservationService {
                 reservationRepository.checkCarStatus(car.getId(),pickUpTime,dropOfTime,status);
 
         return existReservation;
+    }
+
+    public List<ReservationDTO> getAllReservations() {
+        List<Reservation> reservations = reservationRepository.findAll();
+        return reservationMapper.map(reservations);
+    }
+
+    public Page<ReservationDTO> getAllWithPage(Pageable pageable) {
+        Page<Reservation> reservationPage = reservationRepository.findAll(pageable);
+        return reservationPage.map(reservationMapper::reservationToreservationDTO);
     }
 }
