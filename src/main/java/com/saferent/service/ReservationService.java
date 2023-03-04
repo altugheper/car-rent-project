@@ -54,7 +54,7 @@ public class ReservationService {
 
     }
     // !!! Istenen rezervasyon tarihleri doğru mu ???
-    private void checkReservationTimeIsCorrect(LocalDateTime pickUpTime,
+    public void checkReservationTimeIsCorrect(LocalDateTime pickUpTime,
                                                LocalDateTime dropOfTime){
         LocalDateTime now = LocalDateTime.now();
 
@@ -74,7 +74,7 @@ public class ReservationService {
     }
 
     // !!! Araç müsait mi ???
-    private boolean checkCarAvailability(Car car,LocalDateTime pickUpTime,
+    public boolean checkCarAvailability(Car car,LocalDateTime pickUpTime,
                                          LocalDateTime dropOfTime) {
 
         List<Reservation> existReservations = getConflictReservations(car,pickUpTime,dropOfTime);
@@ -84,7 +84,7 @@ public class ReservationService {
     }
 
     // !!! Fiyat Hesaplaması
-    private Double getTotalPrice(Car car,LocalDateTime pickUpTime,
+    public Double getTotalPrice(Car car,LocalDateTime pickUpTime,
                                  LocalDateTime dropOfTime){
         Long minutes =  ChronoUnit.MINUTES.between(pickUpTime,dropOfTime);
         double hours = Math.ceil(minutes/60.0);
@@ -93,7 +93,7 @@ public class ReservationService {
     }
 
     // !!! Reservasyonlar arası çakışma var mı ???
-    private List<Reservation> getConflictReservations(Car car,LocalDateTime pickUpTime,
+    public List<Reservation> getConflictReservations(Car car,LocalDateTime pickUpTime,
                                                       LocalDateTime dropOfTime ){
         if(pickUpTime.isAfter(dropOfTime)){
             throw  new BadRequestException(ErrorMessage.RESERVATION_TIME_INCORRECT_MESSAGE);

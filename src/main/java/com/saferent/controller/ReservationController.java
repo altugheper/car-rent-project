@@ -13,12 +13,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -96,5 +98,25 @@ public class ReservationController {
         Page<ReservationDTO> allReservations = reservationService.getAllWithPage(pageable);
 
         return ResponseEntity.ok(allReservations);
+    }
+
+    //!!! CheckCarIsAvailable
+    @GetMapping("/auth")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('CUSTOMER')")
+    public ResponseEntity<SfResponse> checkCarIsAvailabe(
+            @RequestParam("carId") Long carId,
+            @RequestParam("pickUpDateTime")
+                @DateTimeFormat(pattern = "MM/dd/yyyy HH:mm:ss")LocalDateTime pickUpTime,
+            @RequestParam("dropOffDateTime")
+                @DateTimeFormat(pattern = "MM/dd/yyyy HH:mm:ss")LocalDateTime dropOffTime
+            ){
+
+        Car car = carService.getCarById(carId);
+
+        boolean isAvailable = reservationService.checkCarAvailability(car, pickUpTime, dropOffTime);
+
+        Double totalPrice = reservationService.getTotalPrice(car, pickUpTime, dropOffTime);
+
+        SfResponse response = new SfResponse(isAvailable, totalPrice)
     }
 }
