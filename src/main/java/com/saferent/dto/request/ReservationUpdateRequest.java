@@ -1,15 +1,12 @@
 package com.saferent.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.saferent.domain.Car;
-import com.saferent.domain.User;
 import com.saferent.domain.enums.ReservationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -19,8 +16,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReservationRequest {
-
+public class ReservationUpdateRequest {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "MM/dd/yyyy HH:mm:ss")
     @NotNull(message = "Please provide the pick up time of the reservation")
@@ -38,6 +34,6 @@ public class ReservationRequest {
     @NotBlank(message = "Please provide the drop off location of the reservation")
     private String dropOfLocation;
 
-
+    private ReservationStatus status;
 
 }

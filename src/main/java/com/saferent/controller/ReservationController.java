@@ -4,11 +4,14 @@ import com.saferent.domain.Car;
 import com.saferent.domain.User;
 import com.saferent.dto.ReservationDTO;
 import com.saferent.dto.request.ReservationRequest;
+import com.saferent.dto.request.ReservationUpdateRequest;
+import com.saferent.dto.response.CarAvailabilityResponse;
 import com.saferent.dto.response.ResponseMessage;
 import com.saferent.dto.response.SfResponse;
 import com.saferent.service.CarService;
 import com.saferent.service.ReservationService;
 import com.saferent.service.UserService;
+import org.mapstruct.control.MappingControl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -117,6 +120,55 @@ public class ReservationController {
 
         Double totalPrice = reservationService.getTotalPrice(car, pickUpTime, dropOffTime);
 
-        SfResponse response = new SfResponse(isAvailable, totalPrice)
+        SfResponse response = new
+                CarAvailabilityResponse(ResponseMessage.CAR_AVAILABLE_MESSAGE, true,
+                isAvailable,
+                totalPrice);
+
+        return ResponseEntity.ok(response);
+    }
+
+    //!!!Update
+    @PutMapping("/admin/auth")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<SfResponse> updateReservation(
+            @RequestParam("carId") Long carId,
+            @RequestParam("reservationId") Long reservationId,
+            @Valid @RequestBody ReservationUpdateRequest reservationUpdateRequest) {
+
+        Car car = carService.getCarById(carId);
+        reservationService.updateReservation(reservationId, car, reservationUpdateRequest);
+
+        SfResponse response =
+                new SfResponse(ResponseMessage.RESERVATION_UPDATED_RESPONSE_MESSAGE, true);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    //!!! getReservationById-ADMIN
+    @GetMapping("/{id}/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ReservationDTO> getReservationById(@PathVariable Long id){
+        ReservationDTO reservationDTO = reservationService.getReservationDTO(id);
+        return  ResponseEntity.ok(reservationDTO);
+    }
+
+    //!!! getReservationForSpecificUser-ADMIN
+    @GetMapping("/admin/auth/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<ReservationDTO>> getAllUserReservations(
+            @RequestParam("userId") Long userId,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam("sort") String prop,
+            @RequestParam(value="direction",
+                    required = false,
+                    defaultValue = "DESC") Sort.Direction direction) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, prop));
+
+        User user = userService.getById(userId);
+
+        Page<ReservationDTO> reservationDTOS = reservationService.findReservationPageByUser(user, pageable);
+
+        return ResponseEntity.ok(reservationDTOS);
     }
 }
