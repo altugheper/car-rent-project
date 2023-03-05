@@ -17,5 +17,5 @@ public class ErrorMessage {
     public final static String CAR_USED_BY_RESERVATION_MESSAGE = "Car couldn't be deleted. Car is used by a reservation ";
     public final static String USER_CANT_BE_DELETED_MESSAGE = "User couldn't be deleted. User is used by a reservation ";
     public final static String RESERVATION_STATUS_CANT_CHANGE_MESSAGE = "Reservation can't be updated for canceled or done reservations";
-    public final static String EXCEL_REPORT_ERROR_MESSAGE = "Error occured while generating excel report";
+    public final static String EXCEL_REPORT_ERROR_MESSAGE = "Error occurred while generating excel report";
 }
