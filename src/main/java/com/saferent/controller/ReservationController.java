@@ -1,30 +1,19 @@
 package com.saferent.controller;
 
-import com.saferent.domain.Car;
-import com.saferent.domain.User;
-import com.saferent.dto.ReservationDTO;
-import com.saferent.dto.request.ReservationRequest;
-import com.saferent.dto.request.ReservationUpdateRequest;
-import com.saferent.dto.response.CarAvailabilityResponse;
-import com.saferent.dto.response.ResponseMessage;
-import com.saferent.dto.response.SfResponse;
-import com.saferent.service.CarService;
-import com.saferent.service.ReservationService;
-import com.saferent.service.UserService;
-import org.mapstruct.control.MappingControl;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import com.saferent.domain.*;
+import com.saferent.dto.*;
+import com.saferent.dto.request.*;
+import com.saferent.dto.response.*;
+import com.saferent.service.*;
+import org.springframework.data.domain.*;
+import org.springframework.format.annotation.*;
+import org.springframework.http.*;
+import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.time.LocalDateTime;
-import java.util.List;
+import javax.validation.*;
+import java.time.*;
+import java.util.*;
 
 @RestController
 @RequestMapping("/reservation")
@@ -36,13 +25,10 @@ public class ReservationController {
 
     private final UserService userService;
 
-    private final ReservationRequest reservationRequest;
-
-    public ReservationController(ReservationService reservationService, CarService carService, UserService userService, ReservationRequest reservationRequest) {
+    public ReservationController(ReservationService reservationService, CarService carService, UserService userService) {
         this.reservationService = reservationService;
         this.carService = carService;
         this.userService = userService;
-        this.reservationRequest = reservationRequest;
     }
 
     // !!! make Reservation
@@ -51,18 +37,17 @@ public class ReservationController {
     public ResponseEntity<SfResponse> makeReservation(@RequestParam("carId") Long carId,
                                                       @Valid @RequestBody ReservationRequest reservationRequest) {
 
-        Car car = carService.getCarById(carId);
-        User user = userService.getCurrentUser();
+        Car car =  carService.getCarById(carId);
+        User user =  userService.getCurrentUser();
 
-        reservationService.createReservation(reservationRequest, user, car);
+        reservationService.createReservation(reservationRequest,user,car);
 
         SfResponse response =
-                new SfResponse(ResponseMessage.RESERVATION_CREATED_RESPONSE_MESSAGE, true);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+                new SfResponse(ResponseMessage.RESERVATION_CREATED_RESPONSE_MESSAGE,true);
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
 
     }
-
-    //!!! AdminMakeReservation
+    // !!! AdminMakeReservation
     @PostMapping("/add/auth")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SfResponse> addReservation(
@@ -74,61 +59,65 @@ public class ReservationController {
         User user = userService.getById(userId);
 
         reservationService.createReservation(reservationRequest,user,car);
-        SfResponse response =
-                new SfResponse(ResponseMessage.RESERVATION_CREATED_RESPONSE_MESSAGE, true);
+
+        SfResponse response = new SfResponse(
+                ResponseMessage.RESERVATION_CREATED_RESPONSE_MESSAGE,true);
+
         return new ResponseEntity<>(response,HttpStatus.CREATED);
+
     }
 
-    //!!! GetAllReservation
+    // !!! getAllReservations
     @GetMapping("/admin/all")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<ReservationDTO>> getAllReservations(){
+    public ResponseEntity<List<ReservationDTO>> getAllReservations() {
         List<ReservationDTO> allReservations = reservationService.getAllReservations();
         return ResponseEntity.ok(allReservations);
     }
 
-    //!!! GetAllReservationWithPage
+    // !!! getAllReservationsWithPage
     @GetMapping("/admin/all/pages")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<ReservationDTO>> getAllReservationsWithPage(
             @RequestParam("page") int page,
             @RequestParam("size") int size,
-            @RequestParam("sort") String prop, // neye gore siralanacagi belirtiliyor
-            @RequestParam(value="direction",
-                    required = false, // direction required olmasin
+            @RequestParam("sort") String prop,//neye göre sıralanacağı belirtiliyor
+            @RequestParam(value = "direction",
+                    required = false, // direction required olmasın
                     defaultValue = "DESC") Sort.Direction direction) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, prop));
-        Page<ReservationDTO> allReservations = reservationService.getAllWithPage(pageable);
+        Page<ReservationDTO> allReservations =   reservationService.getAllWithPage(pageable);
 
         return ResponseEntity.ok(allReservations);
     }
 
-    //!!! CheckCarIsAvailable
+    // !!! CheckCarIsAvailable
     @GetMapping("/auth")
     @PreAuthorize("hasRole('ADMIN') or hasRole('CUSTOMER')")
-    public ResponseEntity<SfResponse> checkCarIsAvailabe(
+    public ResponseEntity<SfResponse> checkCarIsAvailable(
             @RequestParam("carId") Long carId,
             @RequestParam("pickUpDateTime")
-                @DateTimeFormat(pattern = "MM/dd/yyyy HH:mm:ss")LocalDateTime pickUpTime,
+            @DateTimeFormat(pattern="MM/dd/yyyy HH:mm:ss")LocalDateTime pickUpTime,
             @RequestParam("dropOffDateTime")
-                @DateTimeFormat(pattern = "MM/dd/yyyy HH:mm:ss")LocalDateTime dropOffTime
-            ){
+            @DateTimeFormat(pattern="MM/dd/yyyy HH:mm:ss")LocalDateTime dropOffTime
+    ) {
 
         Car car = carService.getCarById(carId);
 
-        boolean isAvailable = reservationService.checkCarAvailability(car, pickUpTime, dropOffTime);
+        boolean isAvailable = reservationService.checkCarAvailability(car,pickUpTime,dropOffTime);
 
-        Double totalPrice = reservationService.getTotalPrice(car, pickUpTime, dropOffTime);
+        Double totalPrice = reservationService.getTotalPrice(car,pickUpTime,dropOffTime);
 
-        SfResponse response = new
-                CarAvailabilityResponse(ResponseMessage.CAR_AVAILABLE_MESSAGE, true,
-                isAvailable,
-                totalPrice);
+        SfResponse response =
+                new CarAvailabilityResponse(ResponseMessage.CAR_AVAILABLE_MESSAGE,
+                        true,
+                        isAvailable,
+                        totalPrice);
 
         return ResponseEntity.ok(response);
     }
 
-    //!!!Update
+    // !!! Update
     @PutMapping("/admin/auth")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SfResponse> updateReservation(
@@ -137,31 +126,31 @@ public class ReservationController {
             @Valid @RequestBody ReservationUpdateRequest reservationUpdateRequest) {
 
         Car car = carService.getCarById(carId);
-        reservationService.updateReservation(reservationId, car, reservationUpdateRequest);
+        reservationService.updateReservation(reservationId,car,reservationUpdateRequest);
 
         SfResponse response =
-                new SfResponse(ResponseMessage.RESERVATION_UPDATED_RESPONSE_MESSAGE, true);
+                new SfResponse(ResponseMessage.RESERVATION_UPDATED_RESPONSE_MESSAGE,true);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    //!!! getReservationById-ADMIN
+    // !!! getReservationById-ADMIN
     @GetMapping("/{id}/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ReservationDTO> getReservationById(@PathVariable Long id){
+    public ResponseEntity<ReservationDTO> getReservationById(@PathVariable Long id) {
         ReservationDTO reservationDTO = reservationService.getReservationDTO(id);
-        return  ResponseEntity.ok(reservationDTO);
+        return ResponseEntity.ok(reservationDTO);
     }
 
-    //!!! getReservationForSpecificUser-ADMIN
+    // !!! getReservationForSpecificUser-ADMIN
     @GetMapping("/admin/auth/all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<ReservationDTO>> getAllUserReservations(
             @RequestParam("userId") Long userId,
             @RequestParam("page") int page,
             @RequestParam("size") int size,
-            @RequestParam("sort") String prop,
-            @RequestParam(value="direction",
-                    required = false,
+            @RequestParam("sort") String prop,//neye göre sıralanacağı belirtiliyor
+            @RequestParam(value = "direction",
+                    required = false, // direction required olmasın
                     defaultValue = "DESC") Sort.Direction direction) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, prop));
 
@@ -170,5 +159,51 @@ public class ReservationController {
         Page<ReservationDTO> reservationDTOS = reservationService.findReservationPageByUser(user, pageable);
 
         return ResponseEntity.ok(reservationDTOS);
+
     }
+
+    //***********  Customer veya Admin kendine ait olan reservasyon bilgilerini getirsin  ******
+    @GetMapping("/{id}/auth") // TODO : bakılacak
+    @PreAuthorize("hasRole('ADMIN') or hasRole('CUSTOMER')")
+    public ResponseEntity<ReservationDTO> getUserReservationById(@PathVariable Long id) {
+        User user = userService.getCurrentUser();
+        ReservationDTO reservationDTO =reservationService.findByIdAndUser(id,user);
+        return ResponseEntity.ok(reservationDTO);
+    }
+
+    // getAllReservations
+    @GetMapping("/auth/all")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('CUSTOMER')")
+    public ResponseEntity<Page<ReservationDTO>> getAllUserReservations(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam("sort") String prop,//neye göre sıralanacağı belirtiliyor
+            @RequestParam(value = "direction",
+                    required = false, // direction required olmasın
+                    defaultValue = "DESC") Sort.Direction direction) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, prop));
+        User user = userService.getCurrentUser();
+        Page<ReservationDTO> reservationDTOPage =
+                reservationService.findReservationPageByUser(user, pageable);
+
+        return ResponseEntity.ok(reservationDTOPage);
+    }
+
+    // !!! DELETE
+    @DeleteMapping("/admin/{id}/auth")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<SfResponse> deleteReservation(@PathVariable Long id) {
+        reservationService.removeById(id);
+
+        SfResponse response =
+                new SfResponse(ResponseMessage.RESERVATION_DELETED_RESPONSE_MESSAGE, true);
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
+
+
+
 }

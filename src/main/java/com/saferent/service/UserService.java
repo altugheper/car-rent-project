@@ -3,19 +3,18 @@ package com.saferent.service;
 import com.saferent.domain.*;
 import com.saferent.domain.Role;
 import com.saferent.domain.enums.*;
-import com.saferent.dto.UserDTO;
+import com.saferent.dto.*;
 import com.saferent.dto.request.*;
 import com.saferent.exception.*;
 import com.saferent.exception.message.*;
-import com.saferent.mapper.UserMapper;
+import com.saferent.mapper.*;
 import com.saferent.repository.*;
-import com.saferent.security.SecurityUtils;
+import com.saferent.security.*;
 import org.springframework.context.annotation.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.*;
 import org.springframework.stereotype.*;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.*;
 
 import java.util.*;
 
@@ -33,11 +32,14 @@ public class UserService {
 
     private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository, RoleService roleService, @Lazy PasswordEncoder passwordEncoder, UserMapper userMapper) {
+    private final ReservationService reservationService;
+
+    public UserService(UserRepository userRepository, RoleService roleService, @Lazy PasswordEncoder passwordEncoder, UserMapper userMapper, ReservationService reservationService) {
         this.userRepository = userRepository;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
+        this.reservationService = reservationService;
     }
 
     public User getUserByEmail(String email){
@@ -80,43 +82,46 @@ public class UserService {
 
     }
 
-    // !!! getAllUser
     public List<UserDTO> getAllUsers() {
         List<User> users =  userRepository.findAll();
         List<UserDTO> userDTOs = userMapper.map(users);
         return userDTOs;
     }
 
-    //!!! Sisteme giris yapan User'in bilgisi
     public UserDTO getPrincipal() {
-        User user = getCurrentUser();
-        UserDTO userDTO = userMapper.userToUserDTO(user);
+        User user =  getCurrentUser();
+        UserDTO userDTO =  userMapper.userToUserDTO(user);
         return userDTO;
+
     }
 
     public User getCurrentUser(){
-        String email = SecurityUtils.getCurrentUserLogin().orElseThrow(()->
+        String email =  SecurityUtils.getCurrentUserLogin().orElseThrow(()->
                 new ResourceNotFoundException(ErrorMessage.PRINCIPAL_FOUND_MESSAGE));
-        User user = getUserByEmail(email);
+        User user =  getUserByEmail(email);
 
         return user;
+
     }
 
     public Page<UserDTO> getUserPage(Pageable pageable) {
 
         Page<User> userPage = userRepository.findAll(pageable);
+
         return getUserDTOPage(userPage);
+
     }
 
-    private Page<UserDTO> getUserDTOPage(Page<User> userPage){
+    private Page<UserDTO> getUserDTOPage(Page<User> userPage) {
         return userPage.map(
                 user -> userMapper.userToUserDTO(user));
     }
 
     public UserDTO getUserById(Long id) {
 
-        User user = userRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
+        User user = userRepository.findById(id).orElseThrow(()->
+                new ResourceNotFoundException(
+                        String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
 
         return userMapper.userToUserDTO(user);
     }
@@ -125,70 +130,74 @@ public class UserService {
 
         User user = getCurrentUser();
 
-        //!!! builtIn?
-        if (user.getBuiltIn()){
+        // !!! builtIn ???
+        if(user.getBuiltIn()){
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
-        //!!! Forma girilen OldPassword dogru mu
-        if (!passwordEncoder.matches(updatePasswordRequest.getOldPassword(),user.getPassword())){
+        // !!! Forma girilen OldPassword doğru mu
+        if(!passwordEncoder.matches(updatePasswordRequest.getOldPassword(), user.getPassword())) {
             throw new BadRequestException(ErrorMessage.PASSWORD_NOT_MATCHED_MESSAGE);
         }
 
-        //!!! yeni gelen sifreyi encode edilecek
+        // !!! yeni gelen şifreyi encode edilecek
         String hashedPassword =passwordEncoder.encode(updatePasswordRequest.getNewPassword());
         user.setPassword(hashedPassword);
 
         userRepository.save(user);
     }
 
-
     @Transactional
     public void updateUser(UserUpdateRequest userUpdateRequest) {
+
         User user = getCurrentUser();
         // !!! builtIn ???
         if(user.getBuiltIn()){
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
+
         // !!! email kontrol
         boolean emailExist = userRepository.existsByEmail(userUpdateRequest.getEmail());
+
         if(emailExist && !userUpdateRequest.getEmail().equals(user.getEmail())) {
             throw new ConflictException(
                     String.format(ErrorMessage.EMAIL_ALREADY_EXIST_MESSAGE,userUpdateRequest.getEmail()));
         }
 
         userRepository.update(user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getPhoneNumber(),
-                user.getEmail(),
-                user.getAddress(),
-                user.getZipCode());
+                userUpdateRequest.getFirstName(),
+                userUpdateRequest.getLastName(),
+                userUpdateRequest.getPhoneNumber(),
+                userUpdateRequest.getEmail(),
+                userUpdateRequest.getAddress(),
+                userUpdateRequest.getZipCode());
+
     }
 
     public void updateUserAuth(Long id, AdminUserUpdateRequest adminUserUpdateRequest) {
         User user = getById(id);
-        // !!! builtIn
+        //!!!built-in
         if(user.getBuiltIn()){
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
-        // !!! email kontrol
+        //!!! email kontrolu
         boolean emailExist = userRepository.existsByEmail(adminUserUpdateRequest.getEmail());
+
         if(emailExist && !adminUserUpdateRequest.getEmail().equals(user.getEmail())) {
             throw new ConflictException(
                     String.format(ErrorMessage.EMAIL_ALREADY_EXIST_MESSAGE,adminUserUpdateRequest.getEmail()));
         }
-        //!!! password kontrol
-        if (adminUserUpdateRequest.getPassword()==null){
+        //!!! passsword kontrol
+        if(adminUserUpdateRequest.getPassword()==null) {
             adminUserUpdateRequest.setPassword(user.getPassword());
-        }else {
+        } else {
             String encodedPassword =
                     passwordEncoder.encode(adminUserUpdateRequest.getPassword());
             adminUserUpdateRequest.setPassword(encodedPassword);
         }
-        //!!! Role bilgisi
-        Set<String> userStsRoles = adminUserUpdateRequest.getRoles();
+        //!!! Role
+        Set<String> userStrRoles = adminUserUpdateRequest.getRoles();
 
-        Set<Role> roles = convertRoles(userStsRoles);
+        Set<Role> roles = convertRoles(userStrRoles);
 
         user.setFirstName(adminUserUpdateRequest.getFirstName());
         user.setLastName(adminUserUpdateRequest.getLastName());
@@ -202,6 +211,7 @@ public class UserService {
 
         userRepository.save(user);
 
+
     }
 
     private Set<Role> convertRoles(Set<String> pRoles){ // pRoles={"Customer","Administrator"}
@@ -214,10 +224,10 @@ public class UserService {
             pRoles.forEach(roleStr->{
                 if(roleStr.equals(RoleType.ROLE_ADMIN.getName())){ // Administrator
                     Role adminRole = roleService.findByType(RoleType.ROLE_ADMIN);
-                    roles.add(adminRole); // ROLE_ADMIN
+                    roles.add(adminRole); //ROLE_ADMIN
                 } else {
-                    Role userRole = roleService.findByType(RoleType.ROLE_CUSTOMER);
-                    roles.add(userRole); // ROLE_CUSTOMER
+                    Role userRole = roleService.findByType(RoleType.ROLE_CUSTOMER);// Customer
+                    roles.add(userRole);//ROLE_CUSTOMER
                 }
             });
         }
@@ -235,12 +245,22 @@ public class UserService {
     public void removeUserById(Long id) {
         User user = getById(id);
 
-        // !!! builtIn
+        //!!!built-in
         if(user.getBuiltIn()){
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
 
+        // !!! reservasyon kontrol
+        boolean exist =  reservationService.existByUser(user);
+        if(exist) {
+            throw  new BadRequestException(ErrorMessage.USER_CANT_BE_DELETED_MESSAGE);
+        }
+
         userRepository.deleteById(id);
 
+    }
+
+    public List<User> getUsers() {
+        return userRepository.findAll();
     }
 }

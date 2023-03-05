@@ -6,8 +6,7 @@ import com.saferent.exception.*;
 import com.saferent.exception.message.*;
 import com.saferent.mapper.*;
 import com.saferent.repository.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.*;
 
 import java.util.*;
@@ -19,10 +18,13 @@ public class CarService {
     private final ImageFileService imageFileService;
     private final CarMapper carMapper;
 
-    public CarService(CarRepository carRepository, ImageFileService imageFileService, CarMapper carMapper) {
+    private final ReservationService reservationService;
+
+    public CarService(CarRepository carRepository, ImageFileService imageFileService, CarMapper carMapper, ReservationService reservationService) {
         this.carRepository = carRepository;
         this.imageFileService = imageFileService;
         this.carMapper = carMapper;
+        this.reservationService = reservationService;
     }
 
     public void saveCar(String imageId, CarDTO carDTO) {
@@ -51,17 +53,19 @@ public class CarService {
     }
 
     public Page<CarDTO> findAllWithPage(Pageable pageable) {
-        Page<Car> carPage = carRepository.findAll(pageable);
-        return carPage.map(car -> carMapper.carToCarDTO(car));
+
+        Page<Car> carPage =carRepository.findAll(pageable);
+        return carPage.map(car-> carMapper.carToCarDTO(car));
     }
 
     public CarDTO findById(Long id) {
+
         Car car = getCar(id);
 
         return carMapper.carToCarDTO(car);
     }
 
-    //!!! yardimci method
+    //!!! yardımcı metod
     private Car getCar(Long id){
         Car car = carRepository.findCarById(id).orElseThrow(()->
                 new ResourceNotFoundException(
@@ -72,18 +76,18 @@ public class CarService {
     public void updateCar(Long id, String imageId, CarDTO carDTO) {
         Car car = getCar(id);
 
-        //!!! builtIn
-        if (car.getBuiltIn()){
+        // !!! builtIn ???
+        if(car.getBuiltIn()){
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
 
-        //!!! verilen image daha once baska arac icin kullanilmis mi?
-        ImageFile imageFile = imageFileService.findImageById(imageId);
+        // !!! verilen image daha önce başka araç içni kullanılmış mı ???
+        ImageFile imageFile =  imageFileService.findImageById(imageId);
 
         List<Car> carList = carRepository.findCarsByImageId(imageFile.getId());
         for (Car c : carList) {
-            //Long --> Long
-            if (car.getId().longValue()!=c.getId().longValue()){
+            // Long --> long
+            if(car.getId().longValue()!= c.getId().longValue()){
                 throw  new ConflictException(ErrorMessage.IMAGE_USED_MESSAGE);
             }
         }
@@ -95,7 +99,7 @@ public class CarService {
         car.setLuggage(carDTO.getLuggage());
         car.setModel(carDTO.getModel());
         car.setPricePerHour(carDTO.getPricePerHour());
-        car.setSeats(carDTO.getSeats());
+        car.setSeats(car.getSeats());
         car.setTransmission(carDTO.getTransmission());
 
         car.getImage().add(imageFile);
@@ -106,20 +110,29 @@ public class CarService {
     public void removeById(Long id) {
         Car car = getCar(id);
 
-        //!!! builtIn
-        if (car.getBuiltIn()){
+        // !!! builtIn ???
+        if(car.getBuiltIn()){
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+        // !!! reservasyon kontrol
+        boolean exist =  reservationService.existByCar(car);
+        if(exist) {
+            throw  new BadRequestException(ErrorMessage.CAR_USED_BY_RESERVATION_MESSAGE);
         }
 
         carRepository.delete(car);
-
     }
 
     public Car getCarById(Long carId) {
 
-    Car car = carRepository.findById(carId).orElseThrow(() ->
-            new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, carId)));
+        Car car =  carRepository.findById(carId).orElseThrow(()->
+                new ResourceNotFoundException(
+                        String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, carId)));
+        return car ;
+    }
 
-    return car;
+    public List<Car> getAllCar() {
+
+        return carRepository.getAllBy();
     }
 }

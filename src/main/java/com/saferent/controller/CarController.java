@@ -3,10 +3,7 @@ package com.saferent.controller;
 import com.saferent.dto.*;
 import com.saferent.dto.response.*;
 import com.saferent.service.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
@@ -66,26 +63,31 @@ public class CarController {
         return ResponseEntity.ok(carDTO);
     }
 
-    //!!! Update Car With ImageId
+    //!!! Update Car with ImageId
     @PutMapping("/admin/auth")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SfResponse> updateCar(
             @RequestParam("id") Long id,
             @RequestParam("imageId") String imageId,
-            @Valid @RequestBody CarDTO carDTO){
-        carService.updateCar(id, imageId, carDTO);
-        SfResponse response = new SfResponse(ResponseMessage.CAR_UPDATE_RESPONSE, true);
+            @Valid @RequestBody CarDTO carDTO) {
+        carService.updateCar(id,imageId,carDTO);
+        SfResponse response = new SfResponse(
+                ResponseMessage.CAR_UPDATE_RESPONSE_MESSAGE,true);
 
         return ResponseEntity.ok(response);
     }
 
-    //!!! Delete
+    // !!! Delete
+
     @DeleteMapping("/admin/{id}/auth")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<SfResponse> deleteCar(@PathVariable Long id){
+    public ResponseEntity<SfResponse> deleteCar(@PathVariable Long id) {
         carService.removeById(id);
 
-        SfResponse response = new SfResponse(ResponseMessage.CAR_DELETE_RESPONSE_MESSAGE, true);
-        return ResponseEntity.ok(response);
+        SfResponse response =
+                new SfResponse(ResponseMessage.CAR_DELETE_RESPONSE_MESSAGE,true);
+        return  ResponseEntity.ok(response);
     }
+
+
 }
