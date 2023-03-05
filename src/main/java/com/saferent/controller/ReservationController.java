@@ -189,6 +189,7 @@ public class ReservationController {
         return ResponseEntity.ok(reservationDTOPage);
     }
 
+
     // !!! DELETE
     @DeleteMapping("/admin/{id}/auth")
     @PreAuthorize("hasRole('ADMIN')")
