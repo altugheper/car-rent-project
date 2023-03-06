@@ -25,3 +25,6 @@
 2023-03-05 16:57:06,858 INFO  [restartedMain] org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver:Exposing 15 endpoint(s) beneath base path '/actuator'
 2023-03-05 16:57:06,896 INFO  [restartedMain] org.springframework.boot.web.embedded.tomcat.TomcatWebServer:Tomcat started on port(s): 8080 (http) with context path ''
 2023-03-05 16:57:06,911 INFO  [restartedMain] com.saferent.SaferentApplication:Started SaferentApplication in 4.537 seconds (JVM running for 5.025)
+2023-03-05 19:06:05,228 INFO  [SpringApplicationShutdownHook] org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean:Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-03-05 19:06:05,232 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource:HikariPool-1 - Shutdown initiated...
+2023-03-05 19:06:05,234 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource:HikariPool-1 - Shutdown completed.

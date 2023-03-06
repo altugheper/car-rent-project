@@ -36,7 +36,7 @@ public class ReportController {
                 body(file);
     }
 
-    //******************CAR_REPORT*********************
+    //******************CAR_REPORT**********************
     @GetMapping("/download/cars")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Resource> getCarReport(){
